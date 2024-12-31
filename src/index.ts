@@ -2,6 +2,7 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose'
 
 dotenv.config();
 
@@ -21,6 +22,9 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+mongoose
+  .connect(process.env.MONGO_URI as string)
+  .then(() => {
+    app.listen(port, () => console.log(`DB connected and Server Port: ${port}`));
+  })
+  .catch((error) => console.log(`${error} did not connect`));
