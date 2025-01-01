@@ -2,7 +2,7 @@ import { createUser,updateUser,deleteUser,loginUser } from '../controllers/userC
 import { Router } from 'express';
 const router = Router();
 
-router.post('/create', createUser);
+router.post('/register', createUser);
 router.put('/update/:id', updateUser);
 router.delete('/delete/:id', deleteUser);
 router.post('/login', loginUser);
