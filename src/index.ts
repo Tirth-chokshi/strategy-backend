@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose'
 import userRoutes from './routes/userRoutes'
+import strategyRoutes from './routes/strategyRoutes'
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/users', userRoutes);
+app.use('/strategies', strategyRoutes);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
