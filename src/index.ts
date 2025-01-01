@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose'
+import userRoutes from './routes/userRoutes'
 
 dotenv.config();
 
@@ -15,7 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+// Routes
+app.use('/users', userRoutes);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
