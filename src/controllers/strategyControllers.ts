@@ -75,12 +75,10 @@ class StrategyController {
       }
 
       res.status(200).json({
-        success: true,
         data: strategy,
       });
     } catch (error) {
       res.status(500).json({
-        success: false,
         message: "Error fetching strategy",
       });
     }
