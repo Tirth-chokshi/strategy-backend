@@ -6,8 +6,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const JWT_SECRET = "secret";
-
+const JWT_SECRET = "hi"
 interface IUserCreate {
   email: string;
   password: string;

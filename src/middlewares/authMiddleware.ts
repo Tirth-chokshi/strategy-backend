@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/Strategy';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const JWT_SECRET = "secret"; // Use your actual secret from environment variables
+const JWT_SECRET ="hi"
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {

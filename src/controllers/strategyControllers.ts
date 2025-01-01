@@ -8,7 +8,7 @@ class StrategyController {
     try {
       const { strategyName, status, strategyDetails } = req.body;
       const userId = req.user?._id; // Notice the optional chaining
-      
+
       // Validate required fields
       if (!strategyName || !Array.isArray(strategyDetails)) {
         return res.status(400).json({
@@ -48,13 +48,9 @@ class StrategyController {
       const userId = req.user._id;
       const strategies = await Strategy.find({ userId });
 
-      res.status(200).json({
-        success: true,
-        data: strategies,
-      });
+      res.status(200).json({strategies});
     } catch (error) {
       res.status(500).json({
-        success: false,
         message: "Error fetching strategies",
       });
     }
@@ -269,6 +265,26 @@ class StrategyController {
     }
   }
 
+  
+  async getStrategiesByUser(req: any, res: any) {
+    try {
+        const userId = req.user._id;
+        
+        const strategies = await Strategy.find({ userId });
+        
+        res.status(200).json({
+            success: true,
+            strategies: strategies, // Changed from data to strategies to match frontend
+            message: "Strategies fetched successfully"
+        });
+    } catch (error) {
+        console.error('Error fetching strategies:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching strategies"
+        });
+    }
+}
   // Toggle strategy status
   async toggleStrategyStatus(req: any, res: any) {
     try {
