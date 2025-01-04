@@ -10,7 +10,9 @@ export const getOptionDetails = async (
     const strikePrice = parseFloat(req.body.strikePrice);
 
     if (isNaN(strikePrice)) {
-      res.status(400).json({ message: "Invalid Strike Price. Must be a number." });
+      res
+        .status(400)
+        .json({ message: "Invalid Strike Price. Must be a number." });
       return;
     }
 
@@ -23,11 +25,11 @@ export const getOptionDetails = async (
     }
 
     res.status(200).json({
-      options: optionDetails.map(opt => ({
+      options: optionDetails.map((opt) => ({
         tradingSymbol: opt.tradingSymbol,
         instrumentToken: opt.instrumentToken,
-        option: opt.option
-      }))
+        option: opt.option,
+      })),
     });
   } catch (error) {
     console.error("Error fetching option details:", error);
@@ -35,82 +37,81 @@ export const getOptionDetails = async (
   }
 };
 
+interface SuggestionRequest {
+  query: string;
+}
+
 export const suggestion = async (
-  req: Request<{}, {}, { query: string; type: keyof IOption; strikePrice?: string }>,
+  req: Request<{}, {}, SuggestionRequest>,
   res: Response
 ): Promise<void> => {
   try {
-    const { query, type } = req.body;
+    const { query } = req.body;
 
-    if (type === 'strikePrice') {
-      const numericQuery = parseFloat(query);
-      if (!isNaN(numericQuery)) {
-        // For strike price suggestions, find distinct values within a range
-        const suggestions = await Option.aggregate([
-          {
-            $match: {
-              strikePrice: {
-                $gte: numericQuery,
-                $lt: numericQuery + 500
-              }
-            }
-          },
-          {
-            $group: {
-              _id: "$strikePrice"
-            }
-          },
-          {
-            $limit: 10
-          },
-          {
-            $sort: { _id: 1 }
-          }
-        ]);
-        
-        res.json({ suggestions: suggestions.map(item => item._id) });
-        return;
-      }
-    } else if (type === 'tradingSymbol' && req.body.strikePrice) {
-      const strikePrice = parseFloat(req.body.strikePrice);
-      
-      if (isNaN(strikePrice)) {
-        res.status(400).json({ message: "Invalid Strike Price. Must be a number." });
-        return;
-      }
-
-      // If querying trading symbols and strike price is provided
-      const options = await Option.find({
-        strikePrice
-      }).select('tradingSymbol option').limit(2);
-      
-      res.json({ 
-        suggestions: options.map(opt => opt.tradingSymbol)
+    // If query is empty or not a number
+    if (!query || isNaN(Number(query))) {
+      res.status(400).json({
+        message: "Query must be a number",
+        suggestions: [],
       });
       return;
     }
 
-    // Default case for other fields - only apply regex for string fields
-    if (type !== 'strikePrice' && type !== 'instrumentToken') {
-      const queryRegex = new RegExp(query, "i");
-      const options = await Option.find({ [type]: queryRegex })
-        .select(type)
-        .limit(10);
+    // Convert query to string to ensure proper regex matching
+    const queryString = query.toString();
 
-      res.json({ 
-        suggestions: options.map(opt => opt[type as keyof IOption])
-      });
-    } else {
-      res.status(400).json({ message: "Invalid query type for regex search" });
-    }
-    
+    // Create a regex pattern that matches strike prices containing the query numbers
+    const queryRegex = new RegExp(queryString);
+
+    // Find strike prices that match the regex pattern
+    const suggestions = await Option.aggregate([
+      {
+        // Convert strikePrice to string for regex matching
+        $addFields: {
+          strikePriceString: {
+            $toString: "$strikePrice",
+          },
+        },
+      },
+      {
+        $match: {
+          strikePriceString: queryRegex,
+        },
+      },
+      {
+        // Group by strike price to get unique values
+        $group: {
+          _id: "$strikePrice",
+        },
+      },
+      {
+        // Sort strike prices in ascending order
+        $sort: {
+          _id: 1,
+        },
+      },
+      {
+        // Limit results to prevent overwhelming response
+        $limit: 10,
+      },
+    ]);
+
+    // Extract strike prices from aggregation result
+    const strikePrices = suggestions.map((item) => item._id);
+
+    res.json({
+      suggestions: strikePrices,
+    });
   } catch (error) {
     console.error("Error fetching suggestions:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
-
-export const fetchValues = async (req: Request, res: Response): Promise<void> => {
-  
-};
+export const fetchValues = async (
+  req: Request,
+  res: Response
+): Promise<void> => {};
