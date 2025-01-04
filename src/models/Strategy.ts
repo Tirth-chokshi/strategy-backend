@@ -7,6 +7,8 @@ interface IUser extends Document {
     name: string;
     createdAt: Date;
     updatedAt: Date;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
 }
 
 interface IStrategyDetail extends Document {
@@ -44,6 +46,14 @@ const UserSchema: Schema<IUser> = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    resetPasswordToken: {
+        type: String,
+        required: false,
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false,
     },
     createdAt: {
         type: Date,
