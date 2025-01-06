@@ -18,7 +18,7 @@ const port = 8000;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL as string, "http://localhost:3000"],
     credentials: true,
   })
 );
