@@ -256,7 +256,7 @@ export async function forgotPassword(
       },
     } as TransportOptions);
 
-    const resetUrl = `http://localhost:3000/reset/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
     const mailOptions = {
       to: user.email,
       from: process.env.SMTP_USER,
