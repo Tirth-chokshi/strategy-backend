@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import userRoutes from "./routes/userRoutes";
 import strategyRoutes from "./routes/strategyRoutes";
 import optionRoutes from './routes/optionRoutes'
+import tradeRoutes from './routes/tradeRoutes'
 import { importOptionsFromCSV } from "./utils/csvImporter";
 import path from "path";
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRoutes);
 app.use("/strategies", strategyRoutes);
 app.use('/options', optionRoutes)
+app.use('/trade',tradeRoutes)
 
 // Health check endpoint
 app.get("/health", (req: Request, res: Response) => {
