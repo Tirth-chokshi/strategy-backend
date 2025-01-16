@@ -4,20 +4,21 @@ import { User } from '../models/Strategy';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const JWT_SECRET ="hi"
+const JWT_SECRET = process.env.JWT_SECRET as string
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // Get token from header
-        const authHeader = req.header('Authorization');
-        if (!authHeader?.startsWith('Bearer ')) {
+        // Get token from different sources
+        let token = req.header('Authorization')?.split(' ')[1] || 
+                   req.cookies?.token ||
+                   req.query?.token;
+
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: 'Access denied. No token provided.'
             });
         }
-
-        const token = authHeader.split(' ')[1];
 
         // Verify token
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
